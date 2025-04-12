@@ -81,6 +81,7 @@ class SimpleDrivingEnv(gym.Env):
 
         # Done by reaching goal
         if dist_to_goal < 1.5 and not self.reached_goal:
+            reward +=50
             #print("reached goal")
             self.done = True
             self.reached_goal = True
@@ -96,7 +97,7 @@ class SimpleDrivingEnv(gym.Env):
         self._p.resetSimulation()
         self._p.setTimeStep(self._timeStep)
         self._p.setGravity(0, 0, -10)
-        seld.obstacle = self._p.loadURDF("cube_small.urdf",basePosition=[0,0,0])
+        self.obstacle = self._p.loadURDF("cube_small.urdf",basePosition=[2,2,0])
         # Reload the plane and car
         Plane(self._p)
         self.car = Car(self._p)
@@ -185,6 +186,11 @@ class SimpleDrivingEnv(gym.Env):
         goalPosInCar, goalOrnInCar = self._p.multiplyTransforms(invCarPos, invCarOrn, goalpos, goalorn)
 
         observation = [goalPosInCar[0], goalPosInCar[1]]
+        observation_pos, observation_orn = self._p.getBasePositionAndOrientation(self.obstacle)
+        inv_car_pos, inv_car_orn = self._p.invertTransform(carpos, carorn)
+        observation_rel_pos, _ = self._p.multiplyTransforms(inv_car_pos, inv_car_orn, observation_pos, observation_orn)
+
+        observation += [observation_rel_pos[0], observation_rel_pos[1]]
         return observation
 
     def _termination(self):
