@@ -96,6 +96,7 @@ class SimpleDrivingEnv(gym.Env):
         self._p.resetSimulation()
         self._p.setTimeStep(self._timeStep)
         self._p.setGravity(0, 0, -10)
+        seld.obstacle = self._p.loadURDF("cube_small.urdf",basePosition=[0,0,0])
         # Reload the plane and car
         Plane(self._p)
         self.car = Car(self._p)
